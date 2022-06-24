@@ -93,10 +93,10 @@ export default {
       url: "",
       dynamicHeight: "71px",
       code: "",
-      num: getItem("ztrs"),
-      teams: getItem("teams"),
-      personal_ahmt: getItem("usdt"),
-      community_ahmt: getItem("teams_usdt"),
+      num: getItem("ztrs") || 0,
+      teams: getItem("teams") || 0,
+      personal_ahmt: getItem("usdt") || 0,
+      community_ahmt: getItem("teams_usdt") || 0,
     };
   },
   async created() {
@@ -131,7 +131,7 @@ export default {
     async init() {
       this.code = this.$route.query?.pid || "";
       const sign = localStorage.getItem("mysign");
-      if (!localStorage.getItem("uid") && localStorage.getItem("myaddress")) {
+      if (!localStorage.getItem("uid") || localStorage.getItem("myaddress")) {
         UserReg({
           wallet: localStorage.getItem("myaddress") || "",
           code: this.code,

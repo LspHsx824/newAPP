@@ -95,17 +95,8 @@ export const loadweb3 = async function (func, bsg = false) {
         clearInterval(obj);
         try {
           address = window.tronWeb.defaultAddress.base58;
-          // this.$store.state.address=address
           console.log("地址", address);
-          // mytron_usdt = await window.tronWeb
-          //   .contract()
-          //   .at(contractAddress_usdt);
-          // mytron = await window.tronWeb.contract().at(contractAddress);
-          // myUsdtAmount();
-          // myEOTCAmount();
-          // ethereum.chainId   xxx->测试链
-          // localStorage.setItem("netType", "xxx");
-          // localStorage.setItem("netType", "trx"); //ethereum.chainId
+      
           if (address != localStorage.getItem("myaddress")) clearmymes();
           var mysign = localStorage.getItem("mysign");
           if (mysign == null || mysign == "") {

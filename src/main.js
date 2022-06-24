@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import store from "./store"
 import router from "./router"
+import i18n from "@/i18n"
 
 import VueClipboard from 'vue-clipboard2'
 
@@ -39,44 +40,11 @@ Vue.use(Toast, {
 Vue.use(vant);
 Vue.use(plugin)
 
-// Vue.component('remote-script', {
-//   render: function (createElement) {
-//       var self = this;
-//       return createElement('script', {
-//           attrs: {
-//               type: 'text/javascript',
-//               src: this.src
-//           },
-//           on: {
-//               load: function (event) {
-//                   self.$emit('load', event);
-//               },
-//               error: function (event) {
-//                   self.$emit('error', event);
-//               },
-//               readystatechange: function (event) {
-//                   if (this.readyState == 'complete') {
-//                       self.$emit('load', event);
-//                   }
-//               }
-//           }
-//       });
-//   },
-//   props: {
-//       src: {
-//           type: String,
-//           required: true
-//       }
-//   }
-// });
-
-
-
-
 Vue.config.productionTip = false
 
 new Vue({
   render: h => h(App),
   router,
-  store
+  store,
+  i18n
 }).$mount('#app')

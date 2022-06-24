@@ -4,9 +4,15 @@
     <div id="header" class="header" :class="{ blur: left_show }">
       <div class="logo">
         <!-- <b>LOGO</b> -->
-        <img src="@/static/newImg/logo.c9ddff00.png" @click="$router.replace({
-          name:'content'
-        })" alt="" />
+        <img
+          src="@/static/newImg/logo.c9ddff00.png"
+          @click="
+            $router.replace({
+              name: 'content',
+            })
+          "
+          alt=""
+        />
       </div>
       <div class="right">
         <div class="address" :style="{ fontSize: '13px' }">
@@ -31,11 +37,20 @@
         <div class="menu-popup-content">
           <div class="top">
             <img src="@/static/newImg/logo.c9ddff00.png" class="logo1" alt="" />
-            <img src="../../static/img/cancel.png" @click='cancel_gb' class="cancel" alt="" />
+            <img
+              src="../../static/img/cancel.png"
+              @click="cancel_gb"
+              class="cancel"
+              alt=""
+            />
           </div>
           <div class="popup-address">
             {{ ads | filterads }}
-            <img src="../../static/img/copy.png" @click='copyContent(ads,"钱包地址复制成功")' alt="" />
+            <img
+              src="../../static/img/copy.png"
+              @click="copyContent(ads, '钱包地址复制成功')"
+              alt=""
+            />
           </div>
           <div class="list">
             <div class="van-cell" @click="handle_router('content')">
@@ -75,15 +90,20 @@
               <img src="../../static/img/xz.png" alt="" />
             </div>
           </div>
-          <span v-if='false' class="menu-popou van-popover__wrapper"
-            ><div class="lang-bg">
-              English
-              <img
-                src="../../static/img/xz.png"
-                alt=""
-                class="icon-bottom"
-              /></div
-          ></span>
+
+          <van-popover
+            v-model="showPopover"
+            trigger="click"
+            :actions="selectLangs"
+            @select="handle_lang"
+          >
+            <template #reference>
+              <van-button class="lang-bg">
+                {{ default_lang }}
+                <img src="../../static/img/xz.png" alt="" class="icon-bottom" />
+              </van-button>
+            </template>
+          </van-popover>
         </div>
       </van-popup>
     </div>
@@ -92,26 +112,37 @@
 </template>
 
 <script>
-
-import PubSub from "pubsub-js"
-
+import PubSub from "pubsub-js";
 
 export default {
   name: "home-index",
   data() {
     return {
+      showPopover: false,
+      default_lang: "简体中文",
+      selectLangs: [
+        { text: "简体中文", lang: "zh" },
+        { text: "English", lang: "en" },
+      ],
       left_show: false,
       ads: localStorage.getItem("myaddress") || "",
     };
   },
-  created(){
+  created() {
     PubSub.subscribe("setads", () => {
-      this.ads = localStorage.getItem("myaddress")
+      this.ads = localStorage.getItem("myaddress");
     });
   },
   methods: {
-    cancel_gb(){
-      this.left_show = false
+    handle_lang(lang) {
+      console.log(lang.text);
+      console.log(lang.lang);
+      this.default_lang = lang.text
+      this.$i18n.locale = lang.lang || 'zh'
+      localStorage.setItem("lang", lang.lang )
+    },
+    cancel_gb() {
+      this.left_show = false;
     },
     show_leftmenu() {
       this.left_show = true;
@@ -125,7 +156,6 @@ export default {
         name: path,
       });
     },
-
   },
   filters: {
     filterads(val) {
@@ -148,8 +178,7 @@ export default {
 @import url("../../static/css/04.css");
 @import url("../../static/css/app.css");
 
-
-.contatiner{
+.contatiner {
   max-width: 100vw !important;
 }
 
@@ -177,4 +206,9 @@ export default {
 ::-webkit-scrollbar {
   display: none; /* Chrome Safari */
 }
+
+
+
+
+
 </style>

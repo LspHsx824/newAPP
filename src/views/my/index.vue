@@ -29,11 +29,9 @@
     </div>
 
     <div class="black-1">
-      <div class="title">简介</div>
+      <div class="title">{{$t('home_top.brief')}}</div>
       <div class="desc" :style="{ width: '7rem' }">
-        SLT1N源自迪拜，SLT1NDAO组织由 STAR
-        NETWORK核心团队迪拜码头帆船俱乐部等投资人创办，
-        帆船代表着无所畏惧，成功的第一部就是扬帆起航，永不停歇。
+        {{$t('home_top.briefcontent')}}
       </div>
       <div class="price">
         <img
@@ -41,7 +39,7 @@
           :style="{ marginTop: '35px' }"
           alt=""
         />
-        <div class="key" :style="{ marginTop: '35px' }">当前价格</div>
+        <div class="key" :style="{ marginTop: '35px' }">{{$t('home_top.homeT_price')}}</div>
         <div class="val" :style="{ marginTop: '35px' }">$ 0.8</div>
       </div>
     </div>
@@ -58,10 +56,10 @@
         <van-swipe-item v-for="(item, i) in dataList" :key="i">
           <img class="img img-2" :src="item.img_url" alt="" />
           <section class="sec">
-            <p>{{ item.content }}</p>
-            <p>{{ item.data }}</p>
+            <p>{{  $t("home_top.earnings",{type:item.content}) }}</p>
+            <p>{{ $t("home_top.data",{type:item.data}) }}</p>
           </section>
-          <div class="btn-swipe" @click="show_buy(++i)">一键参与</div>
+          <div class="btn-swipe" @click="show_buy(++i)">{{$t('home_top.homeBto_participate')}}</div>
         </van-swipe-item>
       </van-swipe>
     </div>
@@ -131,7 +129,7 @@
 </template>
 
 <script>
-import { loadweb3, userBaseMes } from "@/utils/web3";
+import { loadweb3} from "@/utils/web3";
 import {
   Reconstruction_getTrxBalance,
   SendUSDT,
@@ -141,15 +139,17 @@ import {
 import { UserReg, LoginMes } from "@/api/trxRequest";
 
 import { setLocalstorage } from "@/utils/utils";
+import { getItem } from '@/utils/storage';
+
 
 export default {
   name: "my-home",
   async created() {
-    console.log("每次执行");
     await loadweb3(this.init);
   },
   data() {
     return {
+      curLang:getItem('lang')|| 'en',
       invite_ipt_show: false,
       invite_ipt: "",
       inputVal: "",
@@ -199,6 +199,7 @@ export default {
   methods: {
     ok_invite() {
       const sign = localStorage.getItem("mysign");
+      console.log(sign);
       UserReg({
         wallet: localStorage.getItem("myaddress") || "",
         code: this.invite_ipt,
@@ -226,8 +227,12 @@ export default {
       this.invite_ipt_show = false;
     },
     show_buy(num_i) {
-      console.log(num_i);
       this.inputVal = "";
+      const uid = localStorage.getItem("uid");
+      if (!uid || uid === "0") {
+          this.ok_invite()
+          return false
+      }
       if (num_i === 1) {
         this.inputVal = 50;
         this.activeIndex = num_i;
@@ -266,7 +271,7 @@ export default {
     async init() {
       this.code = this.$route.query?.pid || "";
       const sign = localStorage.getItem("mysign");
-      if (!localStorage.getItem("uid") && localStorage.getItem("myaddress")) {
+      if (!localStorage.getItem("uid") || localStorage.getItem("myaddress")) {
         UserReg({
           wallet: localStorage.getItem("myaddress") || "",
           code: this.code,
@@ -281,7 +286,7 @@ export default {
               this.invite_ipt_show = true;
               return false;
             }
-            console.log(localStorage.getItem("uid"));
+            console.log('当前用户 uid',localStorage.getItem("uid"));
             const { data } = await LoginMes({
               uid: localStorage.getItem("uid"),
               sign: localStorage.getItem("mysign"),
@@ -450,4 +455,20 @@ export default {
 ::-webkit-scrollbar {
   display: none; /* Chrome Safari */
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>

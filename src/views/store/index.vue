@@ -47,6 +47,31 @@
         <div class="btn-1" @click="handle_toast()">确定</div>
       </template>
     </van-dialog>
+
+    <van-dialog
+      class="my-dialog"
+      :closeOnClickOverlay="true"
+      :showConfirmButton="false"
+      v-model="invite_ipt_show"
+    >
+      <template>
+        <div class="title">邀请码</div>
+        <div class="input-1 van-cell van-field">
+          <div class="van-cell__value van-cell__value--alone van-field__value">
+            <div class="van-field__body">
+              <input
+                type="text"
+                v-model="invite_ipt"
+                placeholder="请输入钱包邀请码地址"
+                class="van-field__control"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="btn-1" @click="ok_invite">确定</div>
+      </template>
+    </van-dialog>
+    
   </div>
 </template>
 
@@ -55,12 +80,16 @@
 
 import { Reconstruction_getTrxBalance,SendUSDT,Reconstruction_verifyUSDT } from "@/utils/web3"
 
+import { UserReg, LoginMes } from "@/api/trxRequest";
 
+import { setLocalstorage } from "@/utils/utils";
 
 export default {
   name: "store-page-content",
   data() {  
     return {
+      invite_ipt_show:false,
+      invite_ipt:"",
       dynamicHeight: "0px",
       show: false,
       value:undefined,
@@ -90,8 +119,42 @@ export default {
     };
   },
   methods: {
+     ok_invite() {
+      const sign = localStorage.getItem("mysign");
+      console.log(sign);
+      UserReg({
+        wallet: localStorage.getItem("myaddress") || "",
+        code: this.invite_ipt,
+        sign: sign,
+      })
+        .then(async (res) => {
+          const uid = res.data.State;
+          localStorage.setItem("uid", uid);
+          if (!uid || uid === "0") {
+            this.$toast.error("请输入钱包邀请码");
+            this.invite_ipt_show = true;
+            return false;
+          }
+          console.log(localStorage.getItem("uid"));
+          const { data } = await LoginMes({
+            uid: localStorage.getItem("uid"),
+            sign: localStorage.getItem("mysign"),
+          });
+          setLocalstorage(data);
+        })
+        .catch((err) => {
+          console.warn(err);
+        });
+      this.invite_ipt_show = false;
+    },
     show_buy(active) {
-      this.value = undefined
+      this.value = ''
+      const uid = localStorage.getItem("uid");
+      if (!uid || uid === "0") {
+          this.$toast.error('请输入钱包邀请码进行注册')
+        this.invite_ipt_show = true
+          return false
+      }
       if(active ===1){
         this.value = 50
       }
