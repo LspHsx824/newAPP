@@ -1,0 +1,318 @@
+.page-index {
+  text-align: center;
+  background: #000;
+  position: relative;
+  display: inline-block;
+  width: 10rem;
+  /* height: 53.33333rem; */
+  background-image: url(../img/home-bg.e97fca59.png) !important;
+  background-size: 100% 100%;
+  height: auto;
+}
+.page-index .title-1 {
+  font-family: FZZhengHeiS-EB-GB;
+  font-size: 0.85333rem;
+  background: -webkit-linear-gradient(top, #f2da5c, #8e690f);
+  background: linear-gradient(180deg, #f2da5c, #8e690f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-top: 0.96rem;
+}
+.page-index .desc-1 {
+  width: 8.56rem;
+  height: 1.22667rem;
+  font-size: 0.4rem;
+  background: -webkit-linear-gradient(top, #ffce7f, #facb50);
+  background: linear-gradient(180deg, #ffce7f, #facb50);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 0.66667rem;
+  margin: 0 auto;
+  margin-top: 0.50667rem;
+  margin-bottom: 5.33333rem;
+}
+
+.page-index .my-swipe-1 .img {
+  width: 6.4rem;
+}
+.page-index .my-swipe-1 .van-swipe__indicators {
+  bottom: 0;
+}
+.page-index .my-swipe-1 .van-swipe__indicators .van-swipe__indicator {
+  width: 0.42667rem;
+  height: 0.08rem;
+  border-radius: 0;
+}
+.page-index .black-1 {
+  display: inline-block;
+  width: 10rem;
+  height: 15.14667rem;
+  /* background-image: url(../img/home-black-1.cee50a28.png); */
+  background-image: url(../newImg/a-2.png);
+  background-size: 100% 100%;
+}
+.page-index .black-1 .title {
+  font-size: 0.48rem;
+  font-family: Source Han Serif CN-Heavy, Source Han Serif CN;
+  font-weight: 800;
+  color: #583104;
+  margin-top: 2.05333rem;
+}
+.page-index .black-1 .desc {
+  width: 7.73333rem;
+  height: 3.41333rem;
+  font-size: 0.4rem;
+  font-family: Source Han Serif CN-Bold, Source Han Serif CN;
+  font-weight: 700;
+  color: #000;
+  line-height: 0.66667rem;
+  margin: 0 auto;
+  margin-top: 1.06667rem;
+}
+.page-index .black-1 .price {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-top: 5.01333rem;
+}
+.page-index .black-1 .price img {
+  width: 0.74667rem;
+  margin-right: 0.08rem;
+}
+.page-index .black-1 .price .key {
+  font-size: 0.45333rem;
+  font-family: PingFang SC-Heavy, PingFang SC;
+  font-weight: 800;
+  color: #b77e3a;
+  margin-right: 0.48rem;
+}
+.page-index .black-1 .price .val {
+  font-size: 0.61333rem;
+  font-family: PingFang SC-Heavy, PingFang SC;
+  color: #fff2e1;
+  text-shadow: 0 0 0.08rem rgba(255, 180, 51, 0.74);
+}
+
+.page-index .black-2 {
+  margin-top: 0.18667rem;
+  display: inline-block;
+  width: 100vw;
+  height: 17.57333rem;
+  background-image: url(../img/home-black-2.a0b3f8be.png);
+  background-size: 100% 100%;
+}
+.page-index .black-2 .key {
+  display: inline-block;
+  width: 5.70667rem;
+  height: 0.90667rem;
+  background-image: url(../img/home-black-2-title.1bdf75b8.png);
+  background-size: 100% 100%;
+  line-height: 0.90667rem;
+  margin-top: 3.78667rem;
+  font-size: 0.48rem;
+  font-family: Source Han Serif CN-Heavy, Source Han Serif CN;
+  font-weight: 800;
+  color: #ffd153;
+}
+.page-index .black-2 .my-swipe {
+  margin-top: 0.69333rem;
+}
+.page-index .black-2 .my-swipe .img {
+  width: 6.10667rem;
+}
+.page-index .black-2 .my-swipe .van-swipe-item {
+  position: relative;
+}
+.page-index .black-2 .my-swipe .btn-swipe {
+  display: inline-block;
+  width: 4.05333rem;
+  height: 1.09333rem;
+  background-image: url(../img/home-btn-swipe.e7fbaca3.png);
+  background-size: 100% 100%;
+  display: block;
+  line-height: 1.09333rem;
+  font-size: 0.42667rem;
+  font-family: Source Han Serif CN-Heavy, Source Han Serif CN;
+  font-weight: 800;
+  color: #fff2e1;
+  position: absolute;
+  left: 2.96rem;
+  bottom: 1.15rem;
+}
+
+.page-index .about {
+  display: inline-block;
+  width: 10rem;
+  height: 4.08rem;
+  background-image: url(../img/home-about-bg.8a173ec2.png);
+  background-size: 100% 100%;
+  margin-top: 1.41333rem;
+}
+.page-index .about .about-title {
+  font-size: 0.48rem;
+  font-family: Source Han Serif CN-Bold, Source Han Serif CN;
+  font-weight: 700;
+  color: #fff2e1;
+  margin-top: 0.69333rem;
+}
+.page-index .about .about-row {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-top: 0.72rem;
+}
+.page-index .about .about-row img {
+  width: 0.98667rem;
+  margin: 0 0.66667rem;
+}
+.page-index .black-3 {
+  display: inline-block;
+  width: 10rem;
+  height: 14.88rem;
+  /* background-image: url(../img/home-black-3.e497dea0.png); */
+  background-size: 100% 100%;
+}
+.page-index .black-3 .swiper-container {
+  overflow: visible !important;
+}
+.page-index .black-3 .swiper-container .swiper-wrapper .swiper-slide {
+  width: 4.74667rem;
+}
+.page-index .black-3 .swiper {
+  margin-top: 3.2rem;
+}
+.page-index .black-3 .swiper .swiper-slide-shadow-left,
+.page-index .black-3 .swiper .swiper-slide-shadow-right {
+  opacity: 1;
+}
+.page-index .black-3 .swiper .swiper_item {
+  width: 4.74667rem;
+  position: relative;
+}
+.page-index .black-3 .swiper .income {
+  position: absolute;
+  top: 5.6rem;
+  left: 0;
+  right: 0;
+  font-size: 0.37333rem;
+  color: #4c1a0b;
+  font-weight: 800;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+.page-index .black-3 .swiper .btn-1 {
+  display: inline-block;
+  width: 3.57333rem;
+  height: 1.30667rem;
+  /* background-image: url(../img/btn.a950811b.png); */
+  background-size: 100% 100%;
+  line-height: 1.30667rem;
+  font-family: FZZhengHeiS-EB-GB;
+  font-size: 0.48rem;
+  position: absolute;
+  top: 6.4rem;
+  left: 0.53333rem;
+  z-index: 3000;
+}
+.page-index .black-3 .swiper .img {
+  width: 4.74667rem;
+}
+.page-index .my-dialog {
+  display: inline-block;
+  width: 10rem;
+  height: 8.13333rem;
+  /* background-image: url(../img/dialog-bg.ee98ca4a.png); */
+  background-size: 100% 100%;
+}
+.page-index .my-dialog .title {
+  font-size: 0.45333rem;
+  font-family: Source Han Serif CN-Heavy, Source Han Serif CN;
+  font-weight: 800;
+  color: #ffd153;
+  margin-top: 1.04rem;
+}
+.page-index .my-dialog .cancel {
+  width: 1.22667rem;
+  position: absolute;
+  top: 0;
+  right: 0.53333rem;
+}
+.page-index .my-dialog .input-1 {
+  width: 6rem;
+  height: 1.2rem;
+  background: -webkit-linear-gradient(top, #382b27, #47342d);
+  background: linear-gradient(180deg, #382b27, #47342d);
+  border-radius: 0.13333rem 0.13333rem 0.13333rem 0.13333rem;
+  opacity: 1;
+  border: 0.02667rem solid #ffd153;
+  margin: 0 auto;
+  margin-top: 0.93333rem;
+  font-size: 0.37333rem;
+  font-family: Source Han Serif SC-Regular, Source Han Serif SC;
+  font-weight: 400;
+  color: #fff2e1;
+}
+.page-index .my-dialog .input-1 .van-field__control {
+  color: #fff2e1;
+}
+.page-index .my-dialog .input-1 .van-field__button {
+  color: #fbc407;
+  font-weight: 800;
+}
+.page-index .my-dialog .row-1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  margin: 0 1.86667rem;
+  margin-top: 0.50667rem;
+  font-size: 0.37333rem;
+  font-family: Source Han Serif SC-Bold, Source Han Serif SC;
+  font-weight: 700;
+  color: #fff2e1;
+}
+.page-index .my-dialog .btn-1 {
+  display: inline-block;
+  width: 4.50667rem;
+  height: 1.22667rem;
+  /* background-image: url(../img/btn.a950811b.png); */
+  background-size: 100% 100%;
+  margin-top: 0.8rem;
+  line-height: 1.22667rem;
+  font-size: 0.42667rem;
+  font-family: Source Han Serif CN-Heavy, Source Han Serif CN;
+  font-weight: 800;
+  color: #fff2e1;
+}
