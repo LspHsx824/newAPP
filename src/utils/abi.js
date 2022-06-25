@@ -8,11 +8,14 @@
 //TH4oq291NoktCN345uxdBHd9YakAwG49H3
 export const contractAddress = "TH4oq291NoktCN345uxdBHd9YakAwG49H3";
 
-//测试 Usdt 地址
+
+//正式 Usdt 地址
 // TJ2ijtG2xfaEhrLrU81h742bPfcHL4CL1w
 export const contractAddress_usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
-
 // const contractAddress_usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+export const contractAddress_slt1n = "TM3NCxuWFen8Xjb8CYhDqvvdTCH2xmmLvJ";
+
+
 
 //测试 etoc 地址 
 //TEt19qEdJM2sPBxLB5XmJGWijT6UvFbs1K

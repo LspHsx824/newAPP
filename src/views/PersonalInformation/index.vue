@@ -14,11 +14,13 @@
           SLT1N
         </div>
         <div class="right top">
-          0
-          <div style="font-size: 0.4rem; margin-left: -20px">≈ 0 $</div>
+          {{ slt_Num | filter6}}
+          <div style="font-size: 0.4rem; margin-left: -20px">
+            ≈ {{ slt1nPrice | filterslt1nPrice }} $
+          </div>
         </div>
       </div>
-      <div class="btn-1" @click="handle_money">提现</div>
+      <div class="btn-1" @click="handle_money()">提现</div>
     </div>
 
     <div class="black-2">
@@ -52,6 +54,30 @@
       class="my-dialog"
       :closeOnClickOverlay="true"
       :showConfirmButton="false"
+      v-model="Numipt_show"
+    >
+      <template>
+        <div class="title">提取SLT1N</div>
+        <div class="input-1 van-cell van-field">
+          <div class="van-cell__value van-cell__value--alone van-field__value">
+            <div class="van-field__body">
+              <input
+                type="number"
+                v-model="Numipt"
+                placeholder="提取 SLT1N 数量"
+                class="van-field__control"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="btn-1" @click="withdraw_deposit">提现</div>
+      </template>
+    </van-dialog>
+
+    <van-dialog
+      class="my-dialog"
+      :closeOnClickOverlay="true"
+      :showConfirmButton="false"
       v-model="invite_ipt_show"
     >
       <template>
@@ -77,22 +103,24 @@
 import { Toast } from "vant";
 
 import { loadweb3 } from "@/utils/web3";
-import { UserReg, LoginMes } from "@/api/trxRequest";
+import { UserReg, LoginMes, Tcoin } from "@/api/trxRequest";
 import { setLocalstorage } from "@/utils/utils";
 import { getItem } from "@/utils/storage";
 
-import PubSub from "pubsub-js"
-
+import PubSub from "pubsub-js";
 
 export default {
   name: "PersonalInformation",
   data() {
     return {
+      Numipt_show: false,
+      Numipt: "",
       invite_ipt: "",
       invite_ipt_show: false,
       url: "",
       dynamicHeight: "71px",
       code: "",
+      slt_Num: getItem("slt1n") || 0.0,
       num: getItem("ztrs") || 0,
       teams: getItem("teams") || 0,
       personal_ahmt: getItem("usdt") || 0,
@@ -105,15 +133,18 @@ export default {
       this.dynamicHeight =
         document.getElementById("header").getBoundingClientRect().height + "px";
     });
-    const uid = localStorage.getItem("uid");
     const ads = localStorage.getItem("myaddress");
     await loadweb3(this.init);
-    this.url = `${window.location.origin}/#/index/content?pid=${ads}`;
     console.log(`${window.location.origin}/#/index/content?pid=${ads}`);
 
-    PubSub.subscribe("setData", (uid) => {
-       this.init_localStore()
+    PubSub.subscribe("setData", () => {
+      this.init_localStore();
     });
+  },
+  computed: {
+    slt1nPrice() {
+      return +this.slt_Num * +getItem("slt1n_price");
+    },
   },
   methods: {
     handle_copy(val) {
@@ -125,8 +156,34 @@ export default {
           Toast("复制失败");
         });
     },
-    handle_money() {
-      this.$toast.error("功能暂未开放，合约生成中。。");
+    async withdraw_deposit() {
+      this.$toast.clear();
+      let num = this.Numipt;
+      if (num < 5) {
+        this.$toast.warning("提现金额必须大于 5个");
+        return false;
+      } else if (num > this.slt_Num) {
+        this.$toast.warning("提现金额必须小于于" + this.slt_Num + "个");
+        return false;
+      } else {
+        let lastMoney = Number(this.slt_Num) - num;
+        localStorage.setItem("slt1n", lastMoney);
+        try {
+          const { data } = await Tcoin(num);
+          console.log(data);
+          this.$toast.success("SLT1N 购买成功");
+        } catch (err) {
+          this.$toast.error("功能暂未开放，合约生成中。。");
+        }
+        setTimeout(() => {
+          this.init_localStore();
+          this.Numipt_show = false;
+        }, 300);
+        this.slt_Num = lastMoney;
+      }
+    },
+    async handle_money() {
+      this.Numipt_show = true;
     },
     async init() {
       this.code = this.$route.query?.pid || "";
@@ -141,6 +198,7 @@ export default {
             const uid = res.data.State;
             localStorage.setItem("uid", uid);
 
+            console.log(uid);
             if (!uid || uid === "0") {
               this.$toast.error("请输入钱包邀请码");
               this.invite_ipt_show = true;
@@ -150,6 +208,7 @@ export default {
               uid: localStorage.getItem("uid"),
               sign: localStorage.getItem("mysign"),
             });
+            console.log(data);
             setLocalstorage(data);
             this.init_localStore();
           })
@@ -161,7 +220,7 @@ export default {
           uid: localStorage.getItem("uid"),
           sign: localStorage.getItem("mysign"),
         }).then((data) => {
-          setLocalstorage(data);
+          setLocalstorage(data.data);
           this.init_localStore();
         });
       }
@@ -190,18 +249,28 @@ export default {
         })
         .catch((err) => {
           console.warn(err);
-           this.init_localStore();
+          this.init_localStore();
         });
-
-       this.init_localStore();
+      this.init_localStore();
       this.invite_ipt_show = false;
     },
     init_localStore() {
+      let ads = localStorage.getItem("myaddress");
       this.num = getItem("ztrs");
       this.teams = getItem("teams");
       this.personal_ahmt = getItem("usdt");
       this.community_ahmt = getItem("teams_usdt");
+      this.slt_Num = getItem("slt1n");
+      this.url = `${window.location.origin}/#/index/content?pid=${ads}`;
     },
+  },
+  filters: {
+    filterslt1nPrice(value) {
+      return value.toFixed(2);
+    },
+    filter6(value){
+       return value.toFixed(6);
+    }
   },
 };
 </script>
@@ -317,6 +386,86 @@ export default {
   height: 1.84rem;
   background-image: url(data:image/png;base64,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);
   background-size: 100% 100%;
+}
+
+.my-dialog {
+  // ../img/dialog-bg.ee98ca4a.png
+  background-image: url(../../static/img/dialog-bg.ee98ca4a.png);
+}
+
+.my-dialog {
+  display: inline-block;
+  width: 10rem;
+  height: 8.13333rem;
+  background-size: 100% 100%;
+}
+.my-dialog .title {
+  font-size: 0.45333rem;
+  font-family: Source Han Serif CN-Heavy, Source Han Serif CN;
+  font-weight: 800;
+  color: #ffd153;
+  margin-top: 1.04rem;
+}
+.my-dialog .cancel {
+  width: 1.22667rem;
+  position: absolute;
+  top: 0;
+  right: 0.53333rem;
+}
+.my-dialog .input-1 {
+  width: 6rem;
+  height: 1.2rem;
+  background: -webkit-linear-gradient(top, #382b27, #47342d);
+  background: linear-gradient(180deg, #382b27, #47342d);
+  border-radius: 0.13333rem 0.13333rem 0.13333rem 0.13333rem;
+  opacity: 1;
+  border: 0.02667rem solid #ffd153;
+  margin: 0 auto;
+  margin-top: 0.93333rem;
+  font-size: 0.37333rem;
+  font-family: Source Han Serif SC-Regular, Source Han Serif SC;
+  font-weight: 400;
+  color: #fff2e1;
+}
+.my-dialog .input-1 .van-field__control {
+  color: #fff2e1;
+}
+.my-dialog .input-1 .van-field__button {
+  color: #fbc407;
+  font-weight: 800;
+}
+.my-dialog .row-1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  margin: 0 1.86667rem;
+  margin-top: 0.50667rem;
+  font-size: 0.37333rem;
+  font-family: Source Han Serif SC-Bold, Source Han Serif SC;
+  font-weight: 700;
+  color: #fff2e1;
+}
+.my-dialog .btn-1 {
+  display: inline-block;
+  width: 4.50667rem;
+  height: 1.22667rem;
+  background-image: url(../../static/img/btn.a950811b.png);
+  background-size: 100% 100%;
+  margin-top: 0.8rem;
+  line-height: 1.22667rem;
+  font-size: 0.42667rem;
+  font-family: Source Han Serif CN-Heavy, Source Han Serif CN;
+  font-weight: 800;
+  color: #fff2e1;
 }
 
 .page-me .black-2 .key {

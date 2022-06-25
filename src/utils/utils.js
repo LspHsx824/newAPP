@@ -21,7 +21,6 @@ export default {
 export const setLocalstorage = (obj) => {
   obj = obj?.data || obj;
   for (const [key, val] of Object.entries(obj)) {
-    console.log(key, val);
     setItem(key, val);
   }
   PubSub.publish("setData");

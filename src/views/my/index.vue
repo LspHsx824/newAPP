@@ -29,9 +29,9 @@
     </div>
 
     <div class="black-1">
-      <div class="title">{{$t('home_top.brief')}}</div>
+      <div class="title">{{ $t("home_top.brief") }}</div>
       <div class="desc" :style="{ width: '7rem' }">
-        {{$t('home_top.briefcontent')}}
+        {{ $t("home_top.briefcontent") }}
       </div>
       <div class="price">
         <img
@@ -39,8 +39,12 @@
           :style="{ marginTop: '35px' }"
           alt=""
         />
-        <div class="key" :style="{ marginTop: '35px' }">{{$t('home_top.homeT_price')}}</div>
-        <div class="val" :style="{ marginTop: '35px' }">$ 0.8</div>
+        <div class="key" :style="{ marginTop: '35px' }">
+          {{ $t("home_top.homeT_price") }}
+        </div>
+        <div class="val" :style="{ marginTop: '35px' }">
+          $ {{ Curslt1n_price }}
+        </div>
       </div>
     </div>
 
@@ -56,10 +60,12 @@
         <van-swipe-item v-for="(item, i) in dataList" :key="i">
           <img class="img img-2" :src="item.img_url" alt="" />
           <section class="sec">
-            <p>{{  $t("home_top.earnings",{type:item.content}) }}</p>
-            <p>{{ $t("home_top.data",{type:item.data}) }}</p>
+            <p>{{ $t("home_top.earnings", { type: item.content }) }}</p>
+            <p>{{ $t("home_top.data", { type: item.data }) }}</p>
           </section>
-          <div class="btn-swipe" @click="show_buy(++i)">{{$t('home_top.homeBto_participate')}}</div>
+          <div class="btn-swipe" @click="show_buy(++i)">
+            {{ $t("home_top.homeBto_participate") }}
+          </div>
         </van-swipe-item>
       </van-swipe>
     </div>
@@ -77,6 +83,7 @@
             <div class="van-field__body">
               <input
                 type="text"
+                readonly
                 v-model="inputVal"
                 placeholder="请输入数量"
                 class="van-field__control"
@@ -87,7 +94,7 @@
         </div>
         <div class="row-1">
           <div class="key">预计扣除</div>
-          <div class="val">0.00 SLT1N</div>
+          <div class="val">{{ card_price }} SLT1N</div>
         </div>
         <div class="btn-1" @click="handle_toast">确定</div>
       </template>
@@ -129,18 +136,19 @@
 </template>
 
 <script>
-import { loadweb3} from "@/utils/web3";
+import { loadweb3 } from "@/utils/web3";
 import {
   Reconstruction_getTrxBalance,
   SendUSDT,
+  SendSLT1N,
   Reconstruction_verifyUSDT,
+  Reconstruction_verifySLT1N
 } from "@/utils/web3";
 
-import { UserReg, LoginMes } from "@/api/trxRequest";
+import { UserReg, LoginMes,CheckNft,BuyNFT } from "@/api/trxRequest";
 
 import { setLocalstorage } from "@/utils/utils";
-import { getItem } from '@/utils/storage';
-
+import { getItem } from "@/utils/storage";
 
 export default {
   name: "my-home",
@@ -149,14 +157,16 @@ export default {
   },
   data() {
     return {
-      curLang:getItem('lang')|| 'en',
-      invite_ipt_show: false,
-      invite_ipt: "",
-      inputVal: "",
-      activeIndex: undefined,
-      show: false,
+      Curslt1n_price: getItem("slt1n_price") || "0.8", //当前货币价格
+      curLang: getItem("lang") || "en", //当前语言类型
+      invite_ipt_show: false,  // 用户注册 邀请码 input
+      invite_ipt: "", // 钱包邀请码地址
+      inputVal: "",  // 当前购买 U 的数量
+      activeIndex: "", // 当前激活的 卡牌序号
+      show: false, // 购买卡牌 弹窗显示
       uid: undefined,
-      code: "",
+      card_price: "", // 当前的价格
+      code: "",  // 邀请码 code
       dataList: [
         {
           content: "一星级 50 U",
@@ -226,47 +236,79 @@ export default {
         });
       this.invite_ipt_show = false;
     },
-    show_buy(num_i) {
+    async show_buy(num_i) {
       this.inputVal = "";
       const uid = localStorage.getItem("uid");
       if (!uid || uid === "0") {
-          this.ok_invite()
-          return false
-      }
-      if (num_i === 1) {
-        this.inputVal = 50;
-        this.activeIndex = num_i;
-      }
-      this.show = true;
-    },
-    async handle_toast() {
-      if (this.activeIndex !== 1) {
-        this.$toast.clear();
-        this.$toast.error("等待合约生成中....");
+        this.ok_invite();
         return false;
       }
-      const isVip = localStorage.getItem("vip");
-      if (isVip === "0") {
+      this.activeIndex = num_i;
+      this.hadle_active(num_i);
+      console.log(num_i);
+
+      const my_vip = getItem("vip");
+
+      if (my_vip + 1 === num_i) {
+        this.show = true;
+      } else if (my_vip + 1 < num_i) {
+        this.$toast.error("不能越级购买 NFT 卡牌！");
+        return false
+      } else {
+        const { data } = await CheckNft(num_i);
+        if (data.State === "0") {
+          this.show = true;
+        } else {
+          this.$toast.error("当前 NFT卡牌 未释放玩");
+        }
+      }
+    },
+    async handle_toast() {
+
+       if ([1, 7].includes(this.activeIndex)) {
+        console.log(" 1 7");
         try {
           await Reconstruction_getTrxBalance();
           await Reconstruction_verifyUSDT(this.inputVal);
-          this.$toast.info("正在购买中", {
-            timeout: false,
-          });
           await SendUSDT(this.inputVal);
-          setTimeout(() => {
-            this.$toast.clear();
-          }, 800);
+          await BuyNFT(this.inputVal);
+
+          const { data } = await LoginMes({
+            uid: localStorage.getItem("uid"),
+            sign: localStorage.getItem("mysign"),
+          });
+          setLocalstorage(data);
           this.$toast.success("购买成功");
-          localStorage.setItem("vip", "1");
+          localStorage.setItem("vip", this.activeIndex);
         } catch (err) {
           this.$toast.error(err);
           console.warn(err);
         }
-      } else {
-        this.$toast.warning("请勿重复购买");
+      } else if ([2, 3, 4, 5, 6].includes(this.activeIndex)) {
+        console.log("先执行 stl1N 转账");
+        try {
+          await Reconstruction_getTrxBalance();
+          await Reconstruction_verifySLT1N(this.card_price);
+          await Reconstruction_verifyUSDT(this.inputVal);
+          await SendSLT1N(this.card_price);
+          await SendUSDT(this.inputVal);
+          await BuyNFT(this.inputVal);
+
+          const { data } = await LoginMes({
+            uid: localStorage.getItem("uid"),
+            sign: localStorage.getItem("mysign"),
+          });
+          setLocalstorage(data);
+          this.$toast.success("购买成功");
+          localStorage.setItem("vip", this.activeIndex);
+        } catch (err) {
+          this.$toast.error(err);
+          console.warn(err);
+        }
       }
       this.show = false;
+
+
     },
     async init() {
       this.code = this.$route.query?.pid || "";
@@ -286,7 +328,7 @@ export default {
               this.invite_ipt_show = true;
               return false;
             }
-            console.log('当前用户 uid',localStorage.getItem("uid"));
+            console.log("当前用户 uid", localStorage.getItem("uid"));
             const { data } = await LoginMes({
               uid: localStorage.getItem("uid"),
               sign: localStorage.getItem("mysign"),
@@ -302,8 +344,47 @@ export default {
           uid: localStorage.getItem("uid"),
           sign: localStorage.getItem("mysign"),
         }).then((data) => {
-          setLocalstorage(data);
+          setLocalstorage(data.data);
         });
+      }
+    },
+    hadle_active(num) {
+      switch (num) {
+        case 1: {
+          this.inputVal = 50;
+          this.card_price = 0;
+          break;
+        }
+        case 2: {
+          this.inputVal = 100 * 0.9;
+          this.card_price = ((100 * 0.1) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 3: {
+          this.inputVal = 300 * 0.8;
+          this.card_price = ((300 * 0.2) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 4: {
+          this.inputVal = 1000 * 0.7;
+          this.card_price = ((1000 * 0.3) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 5: {
+          this.inputVal = 5000 * 0.6;
+          this.card_price = ((5000 * 0.4) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 6: {
+          this.inputVal = 10000 * 0.5;
+          this.card_price = ((10000 * 0.5) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 7: {
+          this.inputVal = 50000;
+          this.card_price = 0;
+          break;
+        }
       }
     },
   },
@@ -455,20 +536,4 @@ export default {
 ::-webkit-scrollbar {
   display: none; /* Chrome Safari */
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </style>

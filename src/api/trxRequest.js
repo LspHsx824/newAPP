@@ -63,10 +63,40 @@ export const BuyNFT = (usdt) => {
     sign: getItem("mysign"),
     usdt,
   };
-
   return request({
     method: "post",
     url: "/BuyNFT",
     params,
   });
 };
+
+
+export const Tcoin = (num)=>{
+
+  const params = {
+      uid:getItem('uid'),
+      sign:getItem('mysign'),
+      num,
+  }
+
+   return request({
+    method:"POST",
+    url:"/Tcoin",
+    params
+   })
+}
+
+// 检查 NFT
+export const CheckNft =(nftid)=>{
+
+  const params = {
+    uid:getItem('uid'),
+    nftID:nftid,
+  }
+
+  return request({
+    method:"POST",
+    url:"/CheckNft",
+    params
+  })
+}

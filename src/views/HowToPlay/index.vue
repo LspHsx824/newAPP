@@ -44,7 +44,7 @@
             </tr>
             <tr>
               <td>三星级</td>
-              <td>500U(80%U+20%SLT1N)</td>
+              <td>300U(80%U+20%SLT1N)</td>
               <td>4%</td>
             </tr>
             <tr>

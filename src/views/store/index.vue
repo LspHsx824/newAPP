@@ -6,13 +6,9 @@
           NFT 交易市场
           <p>Company profile</p>
         </div>
-        <div class="item" v-for='(item,i) in dataList' :key='i'>
-          <img
-            :src='item.img_url'
-            alt
-            class="card"
-          />
-          <div class="price">{{item.content}}</div>
+        <div class="item" v-for="(item, i) in dataList" :key="i">
+          <img :src="item.img_url" alt class="card" />
+          <div class="price">{{ item.content }}</div>
           <div class="btn-1" @click="show_buy(++i)">购买</div>
         </div>
       </div>
@@ -32,7 +28,7 @@
               <input
                 type="text"
                 readonly
-                v-model="value"
+                v-model="Num_value"
                 placeholder="请输入数量"
                 class="van-field__control"
               />
@@ -40,9 +36,9 @@
             </div>
           </div>
         </div>
-        <div class="row-1">
+        <div class="row-1" :style="{ padding: '0' }">
           <div class="key">预计扣除</div>
-          <div class="val">0.00 SLT1N</div>
+          <div class="val">{{ card_price }} SLT1N</div>
         </div>
         <div class="btn-1" @click="handle_toast()">确定</div>
       </template>
@@ -71,55 +67,68 @@
         <div class="btn-1" @click="ok_invite">确定</div>
       </template>
     </van-dialog>
-    
   </div>
 </template>
 
 <script>
+import {
+  Reconstruction_getTrxBalance,
+  SendUSDT,
+  SendSLT1N,
+  Reconstruction_verifyUSDT,
+  Reconstruction_verifySLT1N,
+} from "@/utils/web3";
 
-
-import { Reconstruction_getTrxBalance,SendUSDT,Reconstruction_verifyUSDT } from "@/utils/web3"
-
-import { UserReg, LoginMes } from "@/api/trxRequest";
+import { UserReg, LoginMes, CheckNft, BuyNFT } from "@/api/trxRequest";
 
 import { setLocalstorage } from "@/utils/utils";
+import { getItem } from "@/utils/storage";
 
 export default {
   name: "store-page-content",
-  data() {  
+  data() {
     return {
-      invite_ipt_show:false,
-      invite_ipt:"",
+      invite_ipt_show: false,
+      invite_ipt: "",
       dynamicHeight: "0px",
       show: false,
-      value:undefined,
-      active_Item:undefined,
-      dataList:[{
-        content:'日收益 2%',
-        img_url:require("../../static/newImg/card-1.png")
-      },{
-        content:'日收益 3%',
-        img_url:require("../../static/newImg/card-2.png")
-      },{
-        content:'日收益 4%',
-        img_url:require("../../static/newImg/card-3.png")
-      },{
-        content:'日收益 5%',
-        img_url:require("../../static/newImg/card-4.png")
-      },{
-        content:'日收益 6%',
-        img_url:require("../../static/newImg/card-5.png")
-      },{
-        content:'日收益 7%',
-        img_url:require("../../static/newImg/card-6.png")
-      },{
-        content:'日收益 8%',
-        img_url:require("../../static/newImg/card-7.png")
-      },]
+      Num_value: "",
+      card_price: 0,
+      active_Item: undefined,
+      dataList: [
+        {
+          content: "日收益 2%",
+          img_url: require("../../static/newImg/card-1.png"),
+        },
+        {
+          content: "日收益 3%",
+          img_url: require("../../static/newImg/card-2.png"),
+        },
+        {
+          content: "日收益 4%",
+          img_url: require("../../static/newImg/card-3.png"),
+        },
+        {
+          content: "日收益 5%",
+          img_url: require("../../static/newImg/card-4.png"),
+        },
+        {
+          content: "日收益 6%",
+          img_url: require("../../static/newImg/card-5.png"),
+        },
+        {
+          content: "日收益 7%",
+          img_url: require("../../static/newImg/card-6.png"),
+        },
+        {
+          content: "日收益 8%",
+          img_url: require("../../static/newImg/card-7.png"),
+        },
+      ],
     };
   },
   methods: {
-     ok_invite() {
+    ok_invite() {
       const sign = localStorage.getItem("mysign");
       console.log(sign);
       UserReg({
@@ -147,52 +156,127 @@ export default {
         });
       this.invite_ipt_show = false;
     },
-    show_buy(active) {
-      this.value = ''
+    async show_buy(active) {
+      this.Num_value = "";
       const uid = localStorage.getItem("uid");
       if (!uid || uid === "0") {
-          this.$toast.error('请输入钱包邀请码进行注册')
-        this.invite_ipt_show = true
-          return false
+        this.$toast.error("请输入钱包邀请码进行注册");
+        this.invite_ipt_show = true;
+        return false;
       }
-      if(active ===1){
-        this.value = 50
+
+      this.hadle_active(active);
+      this.active_Item = active;
+      console.log(active);
+
+      const my_vip = getItem("vip");
+      if (my_vip + 1 === active) {
+        this.show = true;
+      } else if (my_vip + 1 < active) {
+        this.$toast.error("不能越级购买 NFT 卡牌！");
+      } else {
+        const { data } = await CheckNft(active);
+        if (data.State === "0") {
+          this.show = true;
+        } else {
+          this.$toast.error("当前 NFT卡牌 未释放玩");
+        }
       }
-      this.active_Item = active
-      this.show = true;
     },
-    async handle_toast(){
-      if( this.active_Item!==1){
-         this.$toast.clear()
-        this.$toast.error('等待合约生成中....')
-        return false
-      }
-      const isVip = localStorage.getItem("vip")
-      if(isVip==='0'){
-         console.log('继续购买')
-         try{
-            await Reconstruction_getTrxBalance()
-            await Reconstruction_verifyUSDT(this.value)
-            SendUSDT(this.value)
-            this.$toast.success("购买成功")
-            localStorage.setItem('vip','1')
-         }catch(err){
-          this.$toast.error(err)
+    async handle_toast() {
+      if ([1, 7].includes(this.active_Item)) {
+        console.log(" 1 7");
+        try {
+          await Reconstruction_getTrxBalance();
+          await Reconstruction_verifyUSDT(this.Num_value);
+          await SendUSDT(this.Num_value);
+          await BuyNFT(this.Num_value);
+
+          const { data } = await LoginMes({
+            uid: localStorage.getItem("uid"),
+            sign: localStorage.getItem("mysign"),
+          });
+          setLocalstorage(data);
+          this.$toast.success("购买成功");
+          localStorage.setItem("vip", this.active_Item);
+        } catch (err) {
+          this.$toast.error(err);
           console.warn(err);
-         }
-      }else{
-         this.$toast.warning('请勿重复购买')
+        }
+      } else if ([2, 3, 4, 5, 6].includes(this.active_Item)) {
+        console.log("先执行 stl1N 转账");
+        try {
+          await Reconstruction_getTrxBalance();
+          await Reconstruction_verifySLT1N(this.card_price);
+          await Reconstruction_verifyUSDT(this.Num_value);
+          await SendSLT1N(this.card_price);
+          await SendUSDT(this.Num_value);
+          await BuyNFT(this.Num_value);
+
+           const { data } = await LoginMes({
+            uid: localStorage.getItem("uid"),
+            sign: localStorage.getItem("mysign"),
+          });
+          setLocalstorage(data);
+          this.$toast.success("购买成功");
+          localStorage.setItem("vip", this.active_Item);
+        } catch (err) {
+          this.$toast.error(err);
+          console.warn(err);
+        }
       }
       this.show = false;
-    }
+    },
+    hadle_active(num) {
+      switch (num) {
+        case 1: {
+          this.Num_value = 50;
+          this.card_price = 0;
+          break;
+        }
+        case 2: {
+          this.Num_value = 100 * 0.9;
+          this.card_price = ((100 * 0.1) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 3: {
+          this.Num_value = 300 * 0.8;
+          this.card_price = ((300 * 0.2) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 4: {
+          this.Num_value = 1000 * 0.7;
+          this.card_price = ((1000 * 0.3) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 5: {
+          this.Num_value = 5000 * 0.6;
+          this.card_price = ((5000 * 0.4) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 6: {
+          this.Num_value = 10000 * 0.5;
+          this.card_price = ((10000 * 0.5) / getItem("slt1n_price")).toFixed(6);
+          break;
+        }
+        case 7: {
+          this.Num_value = 50000;
+          this.card_price = 0;
+          break;
+        }
+      }
+    },
   },
-  
+  computed: {
+    // card_price(){
+    //   return  123
+    // }
+  },
 };
 </script>
 
 <style lang="less" scoped>
-
-.page-store{
+.page-store {
   position: fixed;
   left: 0;
   right: 0;
@@ -201,7 +285,7 @@ export default {
   overflow-y: auto;
 }
 .page-content {
-    padding-top: 4.2rem;
+  padding-top: 4.2rem;
 }
 
 .page-store .my-dialog {
@@ -316,7 +400,7 @@ export default {
     margin-bottom: 0px !important;
     -webkit-text-fill-color: #581e04;
   }
-  
+
   .row-1 {
     margin-bottom: 0.85333rem;
     padding: 0 0.4rem;
@@ -343,7 +427,6 @@ export default {
       position: relative;
       img {
         width: 4.4rem;
-        // clip-path: circle(36% at 50% 42%);
       }
       height: 7.22667rem;
       .card {
@@ -388,17 +471,12 @@ export default {
     }
   }
 }
-
-
-
-
 </style>
 
 <style >
 ::-webkit-scrollbar {
   display: none; /* Chrome Safari */
 }
-  
 </style>
 
 

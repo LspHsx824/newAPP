@@ -4,6 +4,7 @@ import {
   contractAbi,
   contractAbi_usdt,
   contractAddress_eotc,
+  contractAddress_slt1n, //slt1 合约
   Contract_EOTC,
   Contract_USDT,
 } from "./abi";
@@ -13,7 +14,7 @@ import PubSub from "pubsub-js";
 import Vue from "vue";
 import { LoginMes } from "@/api/trxRequest";
 
-import { setLocalstorage} from "@/utils/utils"
+import { setLocalstorage } from "@/utils/utils";
 
 // api  url
 
@@ -26,11 +27,11 @@ var address = "";
 var mytron_usdt = null; //是合约对象，生成合约对象后，可以做很多操作，比如获取你的余额，转账等
 var mytron = null;
 
-const trxMin = 20000000;
+const trxMin = 30000000;
 const trxMes = "为使交易顺畅,请确保钱包中不少于30 TRX";
 
 var signMes = "SLT1N请求您签名确认,签名不消耗GAS.";
-import { new_GetHx, BuyNFT } from "@/api/trxRequest";
+import { new_GetHx } from "@/api/trxRequest";
 
 function SetCoinAds() {}
 
@@ -50,18 +51,48 @@ function distsmes1(message) {}
 
 //USDT转账
 export const SendUSDT = async function SendUSDT(val) {
-  let mytron = await window.tronWeb.contract().at(contractAddress_usdt);
-  let res = await mytron
-    .transfer("TAmMnTRYL1AQ8HaPYhjo5SHyHKy7CTq1t9", TronValues(val))
-    .send({
-      feeLimit: 100000000,
-      callValue: 0,
-      shouldPollResponse: false,
-    });
-  new_getxh(val, res);
+  return new Promise(async (resolve, reject) => {
+    try {
+      let mytron = await window.tronWeb.contract().at(contractAddress_usdt);
+      let res = await mytron
+        .transfer("TAmMnTRYL1AQ8HaPYhjo5SHyHKy7CTq1t9", TronValues(val))
+        .send({
+          feeLimit: 100000000,
+          callValue: 0,
+          shouldPollResponse: false,
+        });
+      new_getxh(val, res)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => reject(err));
+    } catch (err) {
+      reject(err);
+    }
+  });
 };
 
-
+export const SendSLT1N = async function SendSLT1N(val) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let mytron = await window.tronWeb.contract().at(contractAddress_slt1n);
+      let res = await mytron
+        .transfer("TBo2VnuGP7cKbuhfduML87npaKsxz81n1D", TronValues(val))
+        .send({
+          feeLimit: 100000000,
+          callValue: 0,
+          shouldPollResponse: false,
+        });
+      new_getxh(val, res)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => reject(err));
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
 
 export const userBaseMes = async function () {
   // Reconstruction_usdtsend(0,"取消")
@@ -83,8 +114,6 @@ export const userBaseMes = async function () {
     sign: localStorage.getItem("mysign"),
   });
   setLocalstorage(data);
-
-  
 };
 
 export const loadweb3 = async function (func, bsg = false) {
@@ -96,7 +125,7 @@ export const loadweb3 = async function (func, bsg = false) {
         try {
           address = window.tronWeb.defaultAddress.base58;
           console.log("地址", address);
-      
+
           if (address != localStorage.getItem("myaddress")) clearmymes();
           var mysign = localStorage.getItem("mysign");
           if (mysign == null || mysign == "") {
@@ -124,11 +153,11 @@ export const loadweb3 = async function (func, bsg = false) {
 //更换连接的钱包(先于loadweb3执行)
 window.addEventListener("message", function (e) {
   if (e.data.message && e.data.message.action == "setAccount") {
-    localStorage.clear();
+    // localStorage.clear();
   }
 
   if (e.data.message && e.data.message.action == "accountsChanged") {
-    clearmymes();
+    // clearmymes();
     console.warn("未连接钱包,请链接钱包后重试");
   }
 });
@@ -431,32 +460,20 @@ export const cancelOrders = async function (oid, val, okFun) {
 async function new_getxh(usdt, hx) {
   //dtype:1 用户质押U，2用户释放U，3商家质押U，4商家释放U，5商家追加U,6商家取回U，7仲裁取回U
   console.log("usdt", usdt, hx);
-  await BuyNFT(usdt);
-  const { data } = await LoginMes({
-    uid: localStorage.getItem("uid"),
-    sign: localStorage.getItem("mysign"),
-  });
-  setLocalstorage(data);
-  new_GetHx({
-    usdt,
-    hx,
-  }).then((data) => {
-    console.log("GetHx", data.data);
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { data } = await new_GetHx({
+        // 写入哈希值
+        usdt,
+        hx,
+      });
+      console.log("GetHx", data);
+      resolve(data);
+    } catch (err) {
+      reject(err);
+    }
   });
 }
-
-// export const getxh = function (dtype, oid, val, hx) {
-//   // dtype: 1 用户质押U，2用户释放U，3商家质押U，
-//   //       4商家释放U，5商家追加U,6商家取回U，7仲裁取回U
-//   GetHx({
-//     dtype,
-//     oid,
-//     val,
-//     hx,
-//   }).then((data) => {
-//     console.log("GetHx", data.data);
-//   });
-// };
 
 export const TronValues = function (val) {
   let vl = parseFloat(val).toFixed(6) * Math.pow(10, 6);
@@ -470,9 +487,6 @@ export const getTrxBalance = function (func) {
     .then((result) => {
       if (parseInt(result) >= trxMin) func();
       else {
-        Message.warning({
-          message: `${trxMes}`,
-        });
         warnmes(trxMes, null);
       }
     });
@@ -794,7 +808,39 @@ export const Reconstruction_usdtsend = function (val, message) {
  */
 export const Reconstruction_verifyUSDT = async function (amountUsdt) {
   if (mytron_usdt == null)
-    mytron_usdt = await window.tronWeb.contract().at(contractAddress_usdt);
+    mytron_usdt = await window.tronWeb.contract().at(contractAddress_slt1n);
+
+  // 默认地址网， shasta测试网
+  let ads = window.tronWeb.defaultAddress.base58;
+
+  return new Promise((resolve, reject) => {
+    mytron_usdt.balanceOf(ads).call(
+      {
+        from: ads,
+      },
+      function (error, result) {
+        if (!error) {
+          let mynum = result / 1000000;
+          if (mynum >= amountUsdt) {
+            console.log("111  钱包余额验证通过，可进行支付");
+            resolve("usdt 钱包余额验证通过，可进行支付");
+          } else {
+            reject(" USDT 余额不足");
+            console.warn("钱包余额不足");
+          }
+          localStorage.setItem("myamount", mynum.toFixed(2));
+        } else {
+          reject("操作失败，请重试  " + error);
+          console.warn("操作失败，请重试  " + error);
+        }
+      }
+    );
+  });
+};
+
+export const Reconstruction_verifySLT1N = async function (amountUsdt) {
+  if (mytron_usdt == null)
+    mytron_usdt = await window.tronWeb.contract().at(contractAddress_slt1n);
 
   // 默认地址网， shasta测试网
   let ads = window.tronWeb.defaultAddress.base58;
@@ -809,9 +855,9 @@ export const Reconstruction_verifyUSDT = async function (amountUsdt) {
           let mynum = result / 1000000;
           if (mynum >= amountUsdt) {
             console.log("钱包余额验证通过，可进行支付");
-            resolve("钱包余额验证通过，可进行支付");
+            resolve("SLT1N 钱包余额验证通过，可进行支付");
           } else {
-            reject("钱包余额不足");
+            reject("SLT1N 钱包余额不足");
             console.warn("钱包余额不足");
           }
           localStorage.setItem("myamount", mynum.toFixed(2));
