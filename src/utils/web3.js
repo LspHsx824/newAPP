@@ -808,11 +808,9 @@ export const Reconstruction_usdtsend = function (val, message) {
  */
 export const Reconstruction_verifyUSDT = async function (amountUsdt) {
   if (mytron_usdt == null)
-    mytron_usdt = await window.tronWeb.contract().at(contractAddress_slt1n);
-
+    mytron_usdt = await window.tronWeb.contract().at(contractAddress_eotc);
   // 默认地址网， shasta测试网
   let ads = window.tronWeb.defaultAddress.base58;
-
   return new Promise((resolve, reject) => {
     mytron_usdt.balanceOf(ads).call(
       {
@@ -841,7 +839,6 @@ export const Reconstruction_verifyUSDT = async function (amountUsdt) {
 export const Reconstruction_verifySLT1N = async function (amountUsdt) {
   if (mytron_usdt == null)
     mytron_usdt = await window.tronWeb.contract().at(contractAddress_slt1n);
-
   // 默认地址网， shasta测试网
   let ads = window.tronWeb.defaultAddress.base58;
 
