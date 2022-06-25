@@ -173,6 +173,11 @@ export default {
             }
             this.hadle_active(active);
             this.active_Item = active;
+            this.$toast.clear()
+
+            console.log(this.Num_value);
+            console.log(typeof this.Num_value);
+            console.log(this.card_price);
 
             const my_vip = getItem("vip");
             if (my_vip + 1 === active) {

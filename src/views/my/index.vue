@@ -231,6 +231,7 @@ export default {
                 .catch((err) => {
                     console.warn(err);
                 });
+            this.Curslt1n_price = localStorage.getItem("slt1n_price")
             this.invite_ipt_show = false;
         },
         async show_buy(num_i) {
@@ -332,6 +333,7 @@ export default {
                             sign: localStorage.getItem("mysign"),
                         });
                         setLocalstorage(data);
+                        this.Curslt1n_price = localStorage.getItem("slt1n_price")
                         console.log("data", data);
                     })
                     .catch((err) => {
@@ -344,6 +346,7 @@ export default {
                 }).then((data) => {
                     setLocalstorage(data.data);
                 });
+                this.Curslt1n_price = localStorage.getItem("slt1n_price")
             }
         },
         hadle_active(num) {

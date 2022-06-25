@@ -1,12 +1,6 @@
 import {
   contractAddress_usdt,
-  contractAddress,
-  contractAbi,
-  contractAbi_usdt,
-  contractAddress_eotc,
   contractAddress_slt1n, //slt1 合约
-  Contract_EOTC,
-  Contract_USDT,
 } from "./abi";
 
 import PubSub from "pubsub-js";
@@ -807,63 +801,79 @@ export const Reconstruction_usdtsend = function (val, message) {
 **let instance = await tronWeb.contract().at("TREwN2qRkME9TyQUz8dG6HfjEyKGMPHAS5");
  */
 export const Reconstruction_verifyUSDT = async function (amountUsdt) {
-  if (mytron_usdt == null)
-    mytron_usdt = await window.tronWeb.contract().at(contractAddress_eotc);
   // 默认地址网， shasta测试网
-  let ads = window.tronWeb.defaultAddress.base58;
-  return new Promise((resolve, reject) => {
-    mytron_usdt.balanceOf(ads).call(
-      {
-        from: ads,
-      },
-      function (error, result) {
-        if (!error) {
-          let mynum = result / 1000000;
-          if (mynum >= amountUsdt) {
-            console.log("111  钱包余额验证通过，可进行支付");
-            resolve("usdt 钱包余额验证通过，可进行支付");
-          } else {
-            reject(" USDT 余额不足");
-            console.warn("钱包余额不足");
-          }
-          localStorage.setItem("myamount", mynum.toFixed(2));
-        } else {
-          reject("操作失败，请重试  " + error);
-          console.warn("操作失败，请重试  " + error);
-        }
+  console.log(amountUsdt);
+  return new Promise(async (resolve, reject) => {
+
+    try {
+      if (mytron_usdt == null) {
+        mytron_usdt = await window.tronWeb.contract().at(contractAddress_usdt);
       }
-    );
+      let ads = window.tronWeb.defaultAddress.base58;
+      mytron_usdt.balanceOf(ads).call(
+        {
+          from: ads,
+        },
+        function (error, result) {
+          if (!error) {
+            let mynum = result / 1000000;
+            console.log("mynum", mynum);
+            console.log("amountUsdt", amountUsdt);
+            if (mynum >= amountUsdt) {
+              console.log("111  钱包余额验证通过，可进行支付");
+              resolve("usdt 钱包余额验证通过，可进行支付");
+            } else {
+              reject(" USDT 余额不足");
+              console.warn("钱包余额不足");
+            }
+            localStorage.setItem("myamount", mynum.toFixed(2));
+          } else {
+            reject("操作失败，请重试 ");
+            console.log(error);
+            console.warn("操作失败，请重试  " + error);
+          }
+        }
+      );
+    } catch (err) {
+      reject(err);
+      console.warn("操作失败，请重试  " + err);
+    }
   });
 };
 
 export const Reconstruction_verifySLT1N = async function (amountUsdt) {
-  if (mytron_usdt == null)
-    mytron_usdt = await window.tronWeb.contract().at(contractAddress_slt1n);
-  // 默认地址网， shasta测试网
-  let ads = window.tronWeb.defaultAddress.base58;
-
-  return new Promise((resolve, reject) => {
-    mytron_usdt.balanceOf(ads).call(
-      {
-        from: ads,
-      },
-      function (error, result) {
-        if (!error) {
-          let mynum = result / 1000000;
-          if (mynum >= amountUsdt) {
-            console.log("钱包余额验证通过，可进行支付");
-            resolve("SLT1N 钱包余额验证通过，可进行支付");
+  console.log(amountUsdt);
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (mytron_usdt == null)
+        mytron_usdt = await window.tronWeb.contract().at(contractAddress_slt1n);
+      // 默认地址网， shasta测试网
+      let ads = window.tronWeb.defaultAddress.base58;
+      mytron_usdt.balanceOf(ads).call(
+        {
+          from: ads,
+        },
+        function (error, result) {
+          if (!error) {
+            let mynum = result / 1000000;
+            if (mynum >= amountUsdt) {
+              console.log("钱包余额验证通过，可进行支付");
+              resolve("SLT1N 钱包余额验证通过，可进行支付");
+            } else {
+              reject("SLT1N 钱包余额不足");
+              console.warn("钱包余额不足");
+            }
+            localStorage.setItem("myamount", mynum.toFixed(2));
           } else {
-            reject("SLT1N 钱包余额不足");
-            console.warn("钱包余额不足");
+            reject("操作失败，请重试  " + error);
+            console.warn("操作失败，请重试  " + error);
           }
-          localStorage.setItem("myamount", mynum.toFixed(2));
-        } else {
-          reject("操作失败，请重试  " + error);
-          console.warn("操作失败，请重试  " + error);
         }
-      }
-    );
+      );
+    } catch (err) {
+      reject(err);
+      console.warn("操作失败，请重试  " + error);
+    }
   });
 };
 
