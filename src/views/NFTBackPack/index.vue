@@ -2,7 +2,7 @@
   <div class="page-content page-mynft">
     <div class="title-1">View your NFT backpack</div>
     <div class="desc-1">Choose your exclusive NFT~</div>
-    <div class="row-1" v-if="isshow">
+    <div class="row-1">
       <div class="item" v-for="(item, i) in viod_List" :key="i">
         <template >
           <img :src="item.img_url" alt class="card" />
@@ -17,13 +17,6 @@
 import { getItem } from "@/utils/storage";
 export default {
   name: "NFTBackPack",
-  created() {
-    const num = localStorage.getItem("vip");
-    console.log(num);
-    if (num == "1") {
-      this.isshow = true;
-    }
-  },
   data() {
     return {
       isshow: false,
